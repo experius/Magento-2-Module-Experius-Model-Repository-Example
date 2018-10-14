@@ -3,41 +3,44 @@
 
 namespace Experius\Blog\Model;
 
-use Experius\Blog\Model\ResourceModel\Blog as ResourceBlog;
-use Magento\Store\Model\StoreManagerInterface;
-use Experius\Blog\Api\BlogRepositoryInterface;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Experius\Blog\Model\ResourceModel\Blog\CollectionFactory as BlogCollectionFactory;
-use Magento\Framework\Api\DataObjectHelper;
-use Experius\Blog\Api\Data\BlogSearchResultsInterfaceFactory;
 use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Experius\Blog\Model\ResourceModel\Blog as ResourceBlog;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Experius\Blog\Api\BlogRepositoryInterface;
 use Experius\Blog\Api\Data\BlogInterfaceFactory;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
+use Experius\Blog\Api\Data\BlogSearchResultsInterfaceFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
 
 class BlogRepository implements BlogRepositoryInterface
 {
 
-    protected $blogFactory;
-
-    private $storeManager;
-
     protected $extensionAttributesJoinProcessor;
 
-    protected $searchResultsFactory;
-
     private $collectionProcessor;
-    protected $dataObjectProcessor;
-
     protected $blogCollectionFactory;
 
     protected $dataBlogFactory;
 
-    protected $resource;
+    protected $searchResultsFactory;
+
+    private $storeManager;
 
     protected $dataObjectHelper;
+
+    protected $resource;
+
+    protected $dataObjectProcessor;
+
+    protected $blogFactory;
+
+    protected $extensibleDataObjectConverter;
 
 
     /**
@@ -62,7 +65,8 @@ class BlogRepository implements BlogRepositoryInterface
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
         CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor
+        JoinProcessorInterface $extensionAttributesJoinProcessor,
+        ExtensibleDataObjectConverter $extensibleDataObjectConverter
     ) {
         $this->resource = $resource;
         $this->blogFactory = $blogFactory;
@@ -74,6 +78,7 @@ class BlogRepository implements BlogRepositoryInterface
         $this->storeManager = $storeManager;
         $this->collectionProcessor = $collectionProcessor;
         $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
+        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
     }
 
     /**
@@ -86,15 +91,24 @@ class BlogRepository implements BlogRepositoryInterface
             $storeId = $this->storeManager->getStore()->getId();
             $blog->setStoreId($storeId);
         } */
+
+        $blogData = $this->extensibleDataObjectConverter->toNestedArray(
+            $blog,
+            [],
+            \Experius\Blog\Api\Data\BlogInterface::class
+        );
+
+        $blogModel = $this->blogFactory->create()->setData($blogData);
+
         try {
-            $this->resource->save($blog);
+            $this->resource->save($blogModel);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the blog: %1',
                 $exception->getMessage()
             ));
         }
-        return $blog;
+        return $blogModel->getDataModel();
     }
 
     /**
@@ -107,7 +121,7 @@ class BlogRepository implements BlogRepositoryInterface
         if (!$blog->getId()) {
             throw new NoSuchEntityException(__('Blog with id "%1" does not exist.', $blogId));
         }
-        return $blog;
+        return $blog->getDataModel();
     }
 
     /**
@@ -127,7 +141,13 @@ class BlogRepository implements BlogRepositoryInterface
         
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
-        $searchResults->setItems($collection->getItems());
+        
+        $items = [];
+        foreach ($collection as $model) {
+            $items[] = $model->getDataModel();
+        }
+        
+        $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;
     }

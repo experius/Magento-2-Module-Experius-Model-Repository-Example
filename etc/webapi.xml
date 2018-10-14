@@ -1,33 +1,33 @@
 <?xml version="1.0" ?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-	<route method="POST" url="/V1/experius-blog/blog">
-		<service class="Experius\Blog\Api\BlogRepositoryInterface" method="save"/>
-		<resources>
-			<resource ref="Experius_Blog::Blog_save"/>
-		</resources>
-	</route>
-	<route method="GET" url="/V1/experius-blog/blog/search">
-		<service class="Experius\Blog\Api\BlogRepositoryInterface" method="getList"/>
-		<resources>
-			<resource ref="Experius_Blog::Blog_view"/>
-		</resources>
-	</route>
-	<route method="GET" url="/V1/experius-blog/blog/:blogId">
-		<service class="Experius\Blog\Api\BlogRepositoryInterface" method="getById"/>
-		<resources>
-			<resource ref="Experius_Blog::Blog_view"/>
-		</resources>
-	</route>
-	<route method="PUT" url="/V1/experius-blog/blog/:blogId">
-		<service class="Experius\Blog\Api\BlogRepositoryInterface" method="save"/>
-		<resources>
-			<resource ref="Experius_Blog::Blog_update"/>
-		</resources>
-	</route>
-	<route method="DELETE" url="/V1/experius-blog/blog/:blogId">
-		<service class="Experius\Blog\Api\BlogRepositoryInterface" method="deleteById"/>
-		<resources>
-			<resource ref="Experius_Blog::Blog_delete"/>
-		</resources>
-	</route>
+    <route method="POST" url="/V1/experius-blog/blog">
+        <service class="Experius\Blog\Api\BlogRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Experius_Blog::Blog_save"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/experius-blog/blog/search">
+        <service class="Experius\Blog\Api\BlogRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Experius_Blog::Blog_view"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/experius-blog/blog/:blogId">
+        <service class="Experius\Blog\Api\BlogRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Experius_Blog::Blog_view"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/experius-blog/blog/:blogId">
+        <service class="Experius\Blog\Api\BlogRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Experius_Blog::Blog_update"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/experius-blog/blog/:blogId">
+        <service class="Experius\Blog\Api\BlogRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Experius_Blog::Blog_delete"/>
+        </resources>
+    </route>
 </routes>

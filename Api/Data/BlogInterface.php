@@ -3,12 +3,12 @@
 
 namespace Experius\Blog\Api\Data;
 
-interface BlogInterface
+interface BlogInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
 
-    const DESCRIPTION = 'description';
     const BLOG_ID = 'blog_id';
     const NAME = 'name';
+    const DESCRIPTION = 'description';
 
     /**
      * Get blog_id
@@ -48,4 +48,19 @@ interface BlogInterface
      * @return \Experius\Blog\Api\Data\BlogInterface
      */
     public function setDescription($description);
+
+    /**
+     * Retrieve existing extension attributes object or create a new one.
+     *
+     * @return \Magento\Framework\Api\ExtensionAttributesInterface|null
+     */
+    public function getExtensionAttributes();
+
+    /**
+     * Set an extension attributes object.
+     *
+     * @param \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
+     * @return $this
+     */
+    public function setExtensionAttributes(\Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes);
 }

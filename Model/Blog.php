@@ -3,75 +3,53 @@
 
 namespace Experius\Blog\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
 use Experius\Blog\Api\Data\BlogInterface;
+use Experius\Blog\Api\Data\BlogInterfaceFactory;
 
-class Blog extends \Magento\Framework\Model\AbstractModel implements BlogInterface
+class Blog extends \Magento\Framework\Model\AbstractModel
 {
 
     protected $_eventPrefix = 'experius_blog_blog';
+    protected $blogDataFactory;
+
+    protected $dataObjectHelper;
 
     /**
-     * @return void
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param BlogInterfaceFactory $blogDataFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
      */
-    protected function _construct()
-    {
-        $this->_init(\Experius\Blog\Model\ResourceModel\Blog::class);
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        BlogInterfaceFactory $blogDataFactory,
+        DataObjectHelper $dataObjectHelper,
+        \Experius\Blog\Model\ResourceModel\Blog $resource,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->blogDataFactory = $blogDataFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
-    /**
-     * Get blog_id
-     * @return string
-     */
-    public function getBlogId()
+    public function getDataModel()
     {
-        return $this->getData(self::BLOG_ID);
+        $blogData = $this->getData();
+        
+        $blogDataObject = $this->blogDataFactory->create();
+        $this->dataObjectHelper->populateWithArray(
+            $blogDataObject,
+            $blogData,
+            BlogInterface::class
+        );
+        
+        return $blogDataObject;
     }
 
-    /**
-     * Set blog_id
-     * @param string $blogId
-     * @return \Experius\Blog\Api\Data\BlogInterface
-     */
-    public function setBlogId($blogId)
-    {
-        return $this->setData(self::BLOG_ID, $blogId);
-    }
-
-    /**
-     * Get name
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->getData(self::NAME);
-    }
-
-    /**
-     * Set name
-     * @param string $name
-     * @return \Experius\Blog\Api\Data\BlogInterface
-     */
-    public function setName($name)
-    {
-        return $this->setData(self::NAME, $name);
-    }
-
-    /**
-     * Get description
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->getData(self::DESCRIPTION);
-    }
-
-    /**
-     * Set description
-     * @param string $description
-     * @return \Experius\Blog\Api\Data\BlogInterface
-     */
-    public function setDescription($description)
-    {
-        return $this->setData(self::DESCRIPTION, $description);
-    }
 }
